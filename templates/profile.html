@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ user.username }} • PiskeGram
+{% endblock %}
+
+{% block content %}
+
+<div class="profile-page">
+
+    <div class="profile-header">
+
+        {% if user.profile_url %}
+
+        <img
+            src="{{ user.profile_url }}"
+            class="profile-avatar"
+        >
+
+        {% else %}
+
+        <div class="profile-avatar profile-placeholder">
+            {{ user.username[0]|upper }}
+        </div>
+
+        {% endif %}
+
+
+        <div class="profile-info">
+
+            <div class="profile-name-row">
+
+                <h1>
+                    {{ user.username }}
+                </h1>
+
+                {% if user.id == session["user_id"] %}
+
+                <a
+                    href="{{ url_for('edit_profile') }}"
+                    class="secondary-btn"
+                >
+                    Edit profile
+                </a>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="profile-stats">
+
+                <span>
+                    <strong>
+                        {{ posts|length }}
+                    </strong>
+                    posts
+                </span>
+
+            </div>
+
+
+            {% if user.bio %}
+
+            <p class="profile-bio">
+                {{ user.bio }}
+            </p>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <div class="profile-tabs">
+
+        <span class="active">
+            POSTS
+        </span>
+
+    </div>
+
+
+    <div class="photo-grid">
+
+        {% for post in posts %}
+
+        <a
+            href="{{ url_for('index') }}"
+            class="grid-item"
+        >
+
+            <img
+                src="{{ post.image_url }}"
+                loading="lazy"
+            >
+
+        </a>
+
+        {% else %}
+
+        <div class="empty-profile">
+
+            <div>
+                📷
+            </div>
+
+            <h3>
+                No posts yet
+            </h3>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

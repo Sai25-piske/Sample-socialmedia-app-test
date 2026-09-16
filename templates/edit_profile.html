@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit Profile • PiskeGram
+{% endblock %}
+
+{% block content %}
+
+<div class="upload-page">
+
+    <div class="upload-card">
+
+        <div class="upload-header">
+
+            <h1>
+                Edit profile
+            </h1>
+
+            <p>
+                Update your profile information.
+            </p>
+
+        </div>
+
+
+        <form
+            method="POST"
+            enctype="multipart/form-data"
+        >
+
+            <label>
+                Profile picture
+            </label>
+
+            <input
+                type="file"
+                name="profile_pic"
+                accept="image/*"
+            >
+
+
+            <label>
+                Bio
+            </label>
+
+            <textarea
+                name="bio"
+                maxlength="255"
+                placeholder="Tell people about yourself..."
+            >{{ user.bio }}</textarea>
+
+
+            <button
+                type="submit"
+                class="primary-btn"
+            >
+                Save changes
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

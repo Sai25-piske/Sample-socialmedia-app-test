@@ -1,0 +1,103 @@
+# =========================
+# Environment & Secrets
+# =========================
+.env
+.env.*
+!.env.example
+
+# AWS credentials
+.aws/
+aws_access_key*
+aws_secret*
+credentials
+config
+
+# SSH / EC2 keys
+*.pem
+*.key
+*.ppk
+
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+
+.venv/
+venv/
+env/
+ENV/
+
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# =========================
+# Flask
+# =========================
+instance/
+*.log
+
+# =========================
+# Docker
+# =========================
+docker-compose.override.yml
+
+# Docker logs
+*.log
+
+# =========================
+# Terraform
+# =========================
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfstate
+terraform.tfstate.*
+*.tfvars
+*.tfvars.json
+
+# Terraform crash/debug files
+crash.log
+crash.*.log
+
+# Terraform lock file
+# Keep this file in Git if using Terraform providers
+# .terraform.lock.hcl
+
+# =========================
+# IDE / Editors
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =========================
+# Temporary files
+# =========================
+*.tmp
+*.temp
+*.bak
+*.swp
+
+# =========================
+# Local database/files
+# =========================
+*.db
+*.sqlite
+*.sqlite3
+
+# =========================
+# Uploaded/generated files
+# =========================
+uploads/
+media/

@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+
+{% block title %}
+Home • PiskeGram
+{% endblock %}
+
+{% block content %}
+
+<div class="feed-layout">
+
+    <section class="feed">
+
+        {% for post in posts %}
+
+        <article
+            class="post-card"
+            data-post-id="{{ post.id }}"
+        >
+
+            <div class="post-header">
+
+                <a
+                    href="{{ url_for(
+                        'profile',
+                        username=post.username
+                    ) }}"
+                    class="user-info"
+                >
+
+                    {% if post.profile_url %}
+
+                    <img
+                        src="{{ post.profile_url }}"
+                        class="avatar"
+                    >
+
+                    {% else %}
+
+                    <div class="avatar avatar-placeholder">
+                        {{ post.username[0]|upper }}
+                    </div>
+
+                    {% endif %}
+
+                    <div>
+                        <strong>
+                            {{ post.username }}
+                        </strong>
+
+                        <span class="post-time">
+                            {{ post.created_at }}
+                        </span>
+                    </div>
+
+                </a>
+
+                {% if post.user_id == session["user_id"] %}
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'delete_post',
+                        post_id=post.id
+                    ) }}"
+                >
+
+                    <button
+                        class="more-btn"
+                        title="Delete"
+                    >
+                        ⋯
+                    </button>
+
+                </form>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="post-image-wrapper">
+
+                <img
+                    src="{{ post.image_url }}"
+                    class="post-image"
+                    loading="lazy"
+                >
+
+            </div>
+
+
+            <div class="post-actions">
+
+                <button
+                    class="action-btn like-btn
+                    {% if post.user_liked %}
+                    liked
+                    {% endif %}"
+                    data-post-id="{{ post.id }}"
+                >
+
+                    <span class="heart">
+                        {% if post.user_liked %}
+                        ♥
+                        {% else %}
+                        ♡
+                        {% endif %}
+                    </span>
+
+                </button>
+
+                <button
+                    class="action-btn"
+                    onclick="focusComment({{ post.id }})"
+                >
+                    💬
+                </button>
+
+            </div>
+
+
+            <div class="post-content">
+
+                <div
+                    class="like-count"
+                    id="likes-{{ post.id }}"
+                >
+                    {{ post.like_count }}
+                    {% if post.like_count == 1 %}
+                    like
+                    {% else %}
+                    likes
+                    {% endif %}
+                </div>
+
+
+                {% if post.caption %}
+
+                <p class="caption">
+
+                    <strong>
+                        {{ post.username }}
+                    </strong>
+
+                    {{ post.caption }}
+
+                </p>
+
+                {% endif %}
+
+
+                <a
+                    class="comments-link"
+                    href="#"
+                >
+                    View all {{ post.comment_count }} comments
+                </a>
+
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'comment',
+                        post_id=post.id
+                    ) }}"
+                    class="comment-form"
+                    id="comment-{{ post.id }}"
+                >
+
+                    <input
+                        type="text"
+                        name="comment"
+                        placeholder="Add a comment..."
+                        autocomplete="off"
+                    >
+
+                    <button type="submit">
+                        Post
+                    </button>
+
+                </form>
+
+            </div>
+
+        </article>
+
+        {% else %}
+
+        <div class="empty-state">
+
+            <div class="empty-icon">
+                📸
+            </div>
+
+            <h2>
+                Welcome to PiskeGram
+            </h2>
+
+            <p>
+                Share your first photo with the world.
+            </p>
+
+            <a
+                href="{{ url_for('upload') }}"
+                class="primary-btn"
+            >
+                Create your first post
+            </a>
+
+        </div>
+
+        {% endfor %}
+
+    </section>
+
+
+    <aside class="sidebar">
+
+        <div class="sidebar-profile">
+
+            {% if current_user.profile_pic %}
+
+            <img
+                src="{{ url_for(
+                    'static',
+                    filename='placeholder.png'
+                ) }}"
+            >
+
+            {% endif %}
+
+            <div>
+
+                <strong>
+                    {{ session["username"] }}
+                </strong>
+
+                <span>
+                    Welcome back 👋
+                </span>
+
+            </div>
+
+        </div>
+
+        <p class="sidebar-text">
+            Keep sharing your moments and connecting
+            with your community.
+        </p>
+
+    </aside>
+
+</div>
+
+{% endblock %}

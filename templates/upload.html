@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}
+Create Post • PiskeGram
+{% endblock %}
+
+{% block content %}
+
+<div class="upload-page">
+
+    <div class="upload-card">
+
+        <div class="upload-header">
+
+            <h1>
+                Create new post
+            </h1>
+
+            <p>
+                Share a photo with your followers.
+            </p>
+
+        </div>
+
+
+        <form
+            method="POST"
+            enctype="multipart/form-data"
+        >
+
+            <label class="upload-box">
+
+                <div class="upload-icon">
+                    📷
+                </div>
+
+                <h3>
+                    Choose a photo
+                </h3>
+
+                <p>
+                    JPG, PNG, GIF or WEBP
+                </p>
+
+                <input
+                    type="file"
+                    name="image"
+                    accept="image/*"
+                    required
+                    onchange="previewImage(event)"
+                >
+
+            </label>
+
+
+            <div
+                id="image-preview"
+                class="image-preview"
+            ></div>
+
+
+            <textarea
+                name="caption"
+                placeholder="Write a caption..."
+                maxlength="500"
+            ></textarea>
+
+
+            <button
+                type="submit"
+                class="primary-btn"
+            >
+                Share post
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}
