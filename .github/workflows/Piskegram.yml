@@ -98,6 +98,8 @@ jobs:
           test -n "$SSH_PRIVATE_KEY"
           test -n "$BASTION_HOST"
           test -n "$PRIVATE_HOST"
+          BASTION_HOST="$(printf '%s' "$BASTION_HOST" | tr -d '\r\n')"
+          PRIVATE_HOST="$(printf '%s' "$PRIVATE_HOST" | tr -d '\r\n')"
           for host in "$BASTION_HOST" "$PRIVATE_HOST"; do
             case "$host" in
               ''|'***'|*://*|*@*|*/*|*:*|*" "*)
@@ -109,18 +111,20 @@ jobs:
           install -d -m 700 ~/.ssh
           printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H "$BASTION_HOST" >> ~/.ssh/known_hosts
+          ssh-keyscan -4 -T 10 -H "$BASTION_HOST" >> ~/.ssh/known_hosts
           ssh -i ~/.ssh/deploy_key \
             -o IdentitiesOnly=yes \
             -o StrictHostKeyChecking=yes \
             "${DEPLOY_USER}@${BASTION_HOST}" \
-            "ssh-keyscan -H '${PRIVATE_HOST}'" >> ~/.ssh/known_hosts
+            "ssh-keyscan -4 -T 10 -H '${PRIVATE_HOST}'" >> ~/.ssh/known_hosts
 
       - name: Check private host connectivity
         env:
           BASTION_HOST: ${{ secrets.BASTION_HOST }}
           PRIVATE_HOST: ${{ secrets.PRIVATE_HOST }}
         run: |
+          BASTION_HOST="$(printf '%s' "$BASTION_HOST" | tr -d '\r\n')"
+          PRIVATE_HOST="$(printf '%s' "$PRIVATE_HOST" | tr -d '\r\n')"
           ssh -i ~/.ssh/deploy_key \
             -o IdentitiesOnly=yes \
             -o StrictHostKeyChecking=yes \
@@ -133,6 +137,8 @@ jobs:
           BASTION_HOST: ${{ secrets.BASTION_HOST }}
           PRIVATE_HOST: ${{ secrets.PRIVATE_HOST }}
         run: |
+          BASTION_HOST="$(printf '%s' "$BASTION_HOST" | tr -d '\r\n')"
+          PRIVATE_HOST="$(printf '%s' "$PRIVATE_HOST" | tr -d '\r\n')"
           rsync -az --delete \
             --exclude '.git/' \
             --exclude '.github/' \
@@ -148,6 +154,8 @@ jobs:
           PRIVATE_HOST: ${{ secrets.PRIVATE_HOST }}
           APP_ENV_FILE: ${{ secrets.APP_ENV_FILE }}
         run: |
+          BASTION_HOST="$(printf '%s' "$BASTION_HOST" | tr -d '\r\n')"
+          PRIVATE_HOST="$(printf '%s' "$PRIVATE_HOST" | tr -d '\r\n')"
           printf '%s\n' "$APP_ENV_FILE" | ssh -i ~/.ssh/deploy_key \
             -o IdentitiesOnly=yes \
             -o StrictHostKeyChecking=yes \
@@ -160,6 +168,8 @@ jobs:
           BASTION_HOST: ${{ secrets.BASTION_HOST }}
           PRIVATE_HOST: ${{ secrets.PRIVATE_HOST }}
         run: |
+          BASTION_HOST="$(printf '%s' "$BASTION_HOST" | tr -d '\r\n')"
+          PRIVATE_HOST="$(printf '%s' "$PRIVATE_HOST" | tr -d '\r\n')"
           ssh -i ~/.ssh/deploy_key \
             -o IdentitiesOnly=yes \
             -o StrictHostKeyChecking=yes \
