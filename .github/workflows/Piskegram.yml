@@ -50,7 +50,8 @@ jobs:
           tar --exclude='./.git' \
             --exclude='./.github' \
             --exclude='./.env' \
-            -czf piskegram-source.tar.gz .
+            -czf "$RUNNER_TEMP/piskegram-source.tar.gz" .
+          cp "$RUNNER_TEMP/piskegram-source.tar.gz" ./piskegram-source.tar.gz
 
       - name: Upload validated source artifact
         uses: actions/upload-artifact@v4
