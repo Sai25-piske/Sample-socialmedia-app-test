@@ -111,6 +111,7 @@ jobs:
           printf '\n' >> ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh-keygen -y -f ~/.ssh/deploy_key > /dev/null
+          echo "Deployment key fingerprint: $(ssh-keygen -lf <(ssh-keygen -y -f ~/.ssh/deploy_key) | awk '{print $2}')"
           ssh-keyscan -4 -T 10 -H "$BASTION_HOST" >> ~/.ssh/known_hosts
           ssh -i ~/.ssh/deploy_key \
             -o IdentitiesOnly=yes \
