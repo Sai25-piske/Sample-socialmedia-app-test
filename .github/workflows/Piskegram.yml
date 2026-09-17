@@ -101,12 +101,10 @@ jobs:
           BASTION_HOST="$(printf '%s' "$BASTION_HOST" | tr -d '\r\n')"
           PRIVATE_HOST="$(printf '%s' "$PRIVATE_HOST" | tr -d '\r\n')"
           for host in "$BASTION_HOST" "$PRIVATE_HOST"; do
-            case "$host" in
-              ''|'***'|*://*|*@*|*/*|*:*|*" "*)
-                echo "Host secrets must contain only an IP address or hostname. Do not include ssh, ubuntu@, or http://."
-                exit 1
-                ;;
-            esac
+            if [[ ! "$host" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ && ! "$host" =~ ^[A-Za-z0-9.-]+$ ]]; then
+              echo "Host secrets must contain only an IPv4 address or DNS hostname. Do not include ssh, ubuntu@, URLs, quotes, ports, or labels."
+              exit 1
+            fi
           done
           install -d -m 700 ~/.ssh
           printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
