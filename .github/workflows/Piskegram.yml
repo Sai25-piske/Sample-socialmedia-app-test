@@ -98,6 +98,14 @@ jobs:
           test -n "$SSH_PRIVATE_KEY"
           test -n "$BASTION_HOST"
           test -n "$PRIVATE_HOST"
+          for host in "$BASTION_HOST" "$PRIVATE_HOST"; do
+            case "$host" in
+              ''|'***'|*://*|*@*|*/*|*:*|*" "*)
+                echo "Host secrets must contain only an IP address or hostname. Do not include ssh, ubuntu@, or http://."
+                exit 1
+                ;;
+            esac
+          done
           install -d -m 700 ~/.ssh
           printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
