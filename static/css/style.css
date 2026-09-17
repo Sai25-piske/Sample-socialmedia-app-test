@@ -4,10 +4,24 @@
     box-sizing: border-box;
 }
 
+:root {
+    --sky-50: #f2fbfe;
+    --sky-100: #dff4fb;
+    --sky-300: #87ceeb;
+    --sky-500: #2f9dcc;
+    --brown-100: #eadfd5;
+    --brown-500: #795548;
+    --brown-700: #5a3825;
+    --brown-900: #3f271b;
+    --surface: #fffdfb;
+    --muted: #8b7770;
+    --border: #e6d8cf;
+}
+
 body {
     font-family: "Inter", sans-serif;
-    background: #fafafa;
-    color: #171717;
+    background: var(--sky-50);
+    color: var(--brown-900);
 }
 
 a {
@@ -20,8 +34,8 @@ a {
 
 .navbar {
     height: 64px;
-    background: white;
-    border-bottom: 1px solid #e8e8e8;
+    background: var(--surface);
+    border-bottom: 1px solid var(--sky-100);
     position: sticky;
     top: 0;
     z-index: 100;
@@ -43,6 +57,7 @@ a {
 .auth-logo {
     font-family: "Pacifico", cursive;
     font-size: 27px;
+    color: var(--brown-700);
 }
 
 .nav-links {
@@ -84,8 +99,8 @@ a {
 }
 
 .post-card {
-    background: white;
-    border: 1px solid #e4e4e4;
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: 14px;
     overflow: hidden;
     margin-bottom: 28px;
@@ -114,7 +129,7 @@ a {
 .post-time {
     display: block;
     font-size: 11px;
-    color: #999;
+    color: var(--muted);
     margin-top: 3px;
 }
 
@@ -128,7 +143,7 @@ a {
     border-radius: 50%;
     object-fit: cover;
 
-    border: 2px solid #f1f1f1;
+    border: 2px solid var(--sky-300);
 }
 
 .avatar-placeholder {
@@ -136,7 +151,7 @@ a {
     justify-content: center;
     align-items: center;
 
-    background: #111;
+    background: var(--brown-700);
     color: white;
 
     font-weight: 700;
@@ -146,7 +161,7 @@ a {
 /* POST IMAGE */
 
 .post-image-wrapper {
-    background: #f3f3f3;
+    background: var(--sky-100);
 }
 
 .post-image {
@@ -174,7 +189,7 @@ a {
 }
 
 .like-btn.liked {
-    color: #ed4956;
+    color: var(--brown-500);
 }
 
 .heart {
@@ -207,12 +222,12 @@ a {
 .comments-link {
     display: block;
     font-size: 13px;
-    color: #8a8a8a;
+    color: var(--muted);
     margin-bottom: 12px;
 }
 
 .comment-form {
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--border);
     padding-top: 12px;
 
     display: flex;
@@ -229,7 +244,7 @@ a {
 .comment-form button {
     background: none;
     border: none;
-    color: #1877f2;
+    color: var(--sky-500);
     font-weight: 700;
     cursor: pointer;
 }
@@ -256,13 +271,13 @@ a {
 
 .sidebar-profile span {
     display: block;
-    color: #999;
+    color: var(--muted);
     font-size: 12px;
     margin-top: 4px;
 }
 
 .sidebar-text {
-    color: #999;
+    color: var(--muted);
     font-size: 12px;
     line-height: 1.6;
     margin-top: 18px;
@@ -278,7 +293,7 @@ a {
 
     padding: 12px;
 
-    background: #111;
+    background: var(--brown-700);
     color: white;
 
     font-size: 14px;
@@ -295,7 +310,7 @@ a {
 }
 
 .secondary-btn {
-    border: 1px solid #ddd;
+    border: 1px solid var(--brown-100);
     border-radius: 8px;
     padding: 8px 14px;
     font-size: 13px;
@@ -322,9 +337,9 @@ a {
 
 .auth-card {
     width: 380px;
-    background: white;
+    background: var(--surface);
 
-    border: 1px solid #ddd;
+    border: 1px solid var(--border);
     border-radius: 14px;
 
     padding: 42px 35px;
@@ -337,7 +352,7 @@ a {
 }
 
 .auth-subtitle {
-    color: #777;
+    color: var(--muted);
     font-size: 13px;
     line-height: 1.5;
     margin-bottom: 25px;
@@ -353,8 +368,8 @@ a {
 .upload-card textarea {
     width: 100%;
 
-    border: 1px solid #ddd;
-    background: #fafafa;
+    border: 1px solid var(--border);
+    background: var(--sky-50);
 
     border-radius: 8px;
 
@@ -366,13 +381,13 @@ a {
 
 .auth-card input:focus,
 .upload-card textarea:focus {
-    border-color: #999;
+    border-color: var(--sky-500);
 }
 
 .divider {
     margin: 25px 0;
 
-    color: #999;
+    color: var(--muted);
     font-size: 11px;
 
     display: flex;
@@ -384,17 +399,17 @@ a {
 .divider::after {
     content: "";
     height: 1px;
-    background: #ddd;
+    background: var(--brown-100);
     flex: 1;
 }
 
 .auth-bottom {
     font-size: 13px;
-    color: #777;
+    color: var(--muted);
 }
 
 .auth-bottom a {
-    color: #1877f2;
+    color: var(--sky-500);
     font-weight: 700;
 }
 
@@ -407,8 +422,8 @@ a {
 }
 
 .upload-card {
-    background: white;
-    border: 1px solid #ddd;
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: 14px;
     padding: 30px;
 }
@@ -423,7 +438,7 @@ a {
 }
 
 .upload-header p {
-    color: #888;
+    color: var(--muted);
     font-size: 13px;
 }
 
@@ -434,7 +449,7 @@ a {
 }
 
 .upload-box {
-    border: 2px dashed #ddd;
+    border: 2px dashed var(--sky-300);
     border-radius: 12px;
 
     min-height: 250px;
@@ -451,7 +466,7 @@ a {
 }
 
 .upload-box:hover {
-    border-color: #999;
+    border-color: var(--sky-500);
 }
 
 .upload-box input {
@@ -468,7 +483,7 @@ a {
 }
 
 .upload-box p {
-    color: #999;
+    color: var(--muted);
     font-size: 12px;
 }
 
@@ -513,7 +528,7 @@ a {
     align-items: center;
     justify-content: center;
 
-    background: #111;
+    background: var(--brown-700);
     color: white;
 
     font-size: 50px;
@@ -545,7 +560,7 @@ a {
 }
 
 .profile-tabs {
-    border-top: 1px solid #ddd;
+    border-top: 1px solid var(--border);
     text-align: center;
     padding: 17px;
 
@@ -555,7 +570,7 @@ a {
 }
 
 .profile-tabs .active {
-    border-top: 2px solid #111;
+    border-top: 2px solid var(--sky-500);
     padding-top: 17px;
 }
 
@@ -568,7 +583,7 @@ a {
 .grid-item {
     aspect-ratio: 1 / 1;
     overflow: hidden;
-    background: #eee;
+    background: var(--sky-100);
 }
 
 .grid-item img {
@@ -597,7 +612,7 @@ a {
     border-radius: 9px;
     margin-bottom: 10px;
 
-    background: #111;
+    background: var(--brown-700);
     color: white;
 
     font-size: 13px;
@@ -606,11 +621,11 @@ a {
 }
 
 .flash.error {
-    background: #d9363e;
+    background: #a84f3f;
 }
 
 .flash.success {
-    background: #111;
+    background: var(--sky-500);
 }
 
 
@@ -627,7 +642,7 @@ a {
 }
 
 .empty-state p {
-    color: #888;
+    color: var(--muted);
     margin: 10px 0 25px;
 }
 
@@ -640,7 +655,7 @@ a {
     grid-column: 1 / -1;
     text-align: center;
     padding: 80px;
-    color: #999;
+    color: var(--muted);
 }
 
 
