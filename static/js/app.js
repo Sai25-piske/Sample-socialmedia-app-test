@@ -22,8 +22,21 @@ document.addEventListener(
         });
 
 
-        document
-            .querySelectorAll(".like-btn")
+        document.querySelectorAll(".like-btn").forEach(function (button) {
+            button.addEventListener("click", async function () {
+                const response = await fetch(button.dataset.url, {
+                    method: "POST"
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    button.classList.toggle("liked", result.liked);
+                    button.querySelector(".like-count").textContent = result.like_count;
+                }
+            });
+        });
+    }
+);
 
 function formatFileSize(bytes) {
     return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
@@ -62,3 +75,17 @@ function previewProfileImage(event) {
 
     if (file && preview) showImagePreview(file, preview);
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll("form[enctype='multipart/form-data']").forEach(function (form) {
+        form.addEventListener("submit", function (event) {
+            const fileInput = form.querySelector("input[type='file']");
+            const file = fileInput && fileInput.files[0];
+
+            if (file && file.size > 15 * 1024 * 1024) {
+                event.preventDefault();
+                window.alert("Please choose an image that is 15 MB or smaller.");
+            }
+        });
+    });
+});

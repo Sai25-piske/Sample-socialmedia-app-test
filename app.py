@@ -488,9 +488,9 @@ def upload():
 
     except Exception as e:
 
-        print(f"S3 upload error: {e}")
+        print(f"S3 upload error ({type(e).__name__}): {e}")
 
-        return "Image upload failed", 500
+        return "Image upload failed. Check the S3 bucket configuration and permissions.", 500
 
     db = None
     cursor = None

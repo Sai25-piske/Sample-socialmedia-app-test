@@ -31,6 +31,10 @@ jobs:
           test -n "$APP_ENV_FILE"
           printf '%s\n' "$APP_ENV_FILE" > .env
           chmod 600 .env
+          grep -Eq '^S3_BUCKET=[^[:space:]]+$' .env || {
+            echo "APP_ENV_FILE must define S3_BUCKET for image uploads."
+            exit 1
+          }
 
       - name: Validate Compose configuration
         run: docker compose config --quiet
@@ -85,6 +89,10 @@ jobs:
           test -n "$APP_ENV_FILE"
           printf '%s\n' "$APP_ENV_FILE" > .env
           chmod 600 .env
+          grep -Eq '^S3_BUCKET=[^[:space:]]+$' .env || {
+            echo "APP_ENV_FILE must define S3_BUCKET for image uploads."
+            exit 1
+          }
 
       - name: Install SSH tools
         run: sudo apt-get update && sudo apt-get install --yes rsync
