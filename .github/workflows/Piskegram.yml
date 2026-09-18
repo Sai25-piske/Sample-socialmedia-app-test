@@ -10,8 +10,8 @@ permissions:
   contents: read
 
 env:
-  APP_PATH: /home/ec2-user/Sample-socialmedia-app-test
-  DEPLOY_USER: ec2-user
+  APP_PATH: /home/ubuntu/Sample-socialmedia-app-test
+  DEPLOY_USER: ubuntu
 
 jobs:
   validate:
