@@ -100,6 +100,7 @@ jobs:
       - name: Configure SSH
         env:
           SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          SSH_PASSPHRASE: ${{ secrets['EC2_SSH_PASSPHRASE'] }}
           BASTION_HOST: ${{ secrets.BASTION_HOST }}
           PRIVATE_HOST: ${{ secrets.PRIVATE_HOST }}
         run: |
@@ -140,8 +141,11 @@ jobs:
           EOF
           chmod 600 ~/.ssh/config
           eval "$(ssh-agent -s)"
-          ssh-keygen -y -f ~/.ssh/deploy_key > /dev/null
-          ssh-add ~/.ssh/deploy_key
+          if [[ -n "$SSH_PASSPHRASE" ]]; then
+            printf '%s\n' "$SSH_PASSPHRASE" | ssh-add ~/.ssh/deploy_key
+          else
+            ssh-add ~/.ssh/deploy_key
+          fi
           printf 'SSH_AUTH_SOCK=%s\n' "$SSH_AUTH_SOCK" >> "$GITHUB_ENV"
           echo "Deployment key fingerprint: $(ssh-add -L | ssh-keygen -lf - | awk '{print $2}')"
           ssh-keyscan -4 -T 10 -H "$BASTION_HOST" >> ~/.ssh/known_hosts
