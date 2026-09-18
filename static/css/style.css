@@ -500,6 +500,43 @@ a {
     border-radius: 10px;
 }
 
+.upload-file-status {
+    color: var(--muted);
+    font-size: 12px;
+    margin: -6px 0 0;
+}
+
+.upload-file-error {
+    color: #b42318;
+    font-weight: 700;
+}
+
+.profile-upload-label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.profile-upload-label span {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.profile-upload-label input {
+    margin-top: 6px;
+}
+
+.profile-image-preview img {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--sky-100);
+}
+
 
 /* PROFILE */
 

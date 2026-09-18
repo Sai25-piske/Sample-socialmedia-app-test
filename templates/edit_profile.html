@@ -28,15 +28,22 @@ Edit Profile • PiskeGram
             enctype="multipart/form-data"
         >
 
-            <label>
+            <label class="profile-upload-label">
                 Profile picture
+                <span>JPG, PNG, GIF or WEBP · up to 15 MB</span>
+                <input
+                    type="file"
+                    name="profile_pic"
+                    accept="image/*"
+                    onchange="previewProfileImage(event)"
+                >
             </label>
 
-            <input
-                type="file"
-                name="profile_pic"
-                accept="image/*"
-            >
+            <div id="profile-image-preview" class="profile-image-preview">
+                {% if user.profile_url %}
+                <img src="{{ user.profile_url }}" alt="Current profile picture">
+                {% endif %}
+            </div>
 
 
             <label>

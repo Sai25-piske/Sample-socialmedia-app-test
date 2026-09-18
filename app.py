@@ -30,7 +30,8 @@ app.secret_key = os.getenv(
     "change-this-secret-key"
 )
 
-app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
+MAX_UPLOAD_BYTES = 15 * 1024 * 1024
+app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
 
 
 # --------------------------------------------------
@@ -52,6 +53,28 @@ def allowed_file(filename):
         and filename.rsplit(".", 1)[1].lower()
         in ALLOWED_EXTENSIONS
     )
+
+
+def validate_upload(file):
+    if not file or not file.filename:
+        return "No image selected"
+
+    if not allowed_file(file.filename):
+        return "Use JPG, JPEG, PNG, GIF, or WEBP images"
+
+    file.stream.seek(0, os.SEEK_END)
+    file_size = file.stream.tell()
+    file.stream.seek(0)
+
+    if file_size > MAX_UPLOAD_BYTES:
+        return "Images must be 15 MB or smaller"
+
+    return None
+
+
+@app.errorhandler(413)
+def request_too_large(error):
+    return "The image is too large. Please choose an image up to 15 MB.", 413
 
 
 # --------------------------------------------------
@@ -394,6 +417,7 @@ def login():
             return "Invalid username or password", 401
 
         session["user_id"] = user["id"]
+        session["username"] = user["username"]
 
         return redirect(
             url_for("feed")
@@ -450,14 +474,9 @@ def upload():
         ""
     ).strip()
 
-    if not file:
-        return "No image selected", 400
-
-    if file.filename == "":
-        return "No image selected", 400
-
-    if not allowed_file(file.filename):
-        return "Invalid image format", 400
+    upload_error = validate_upload(file)
+    if upload_error:
+        return upload_error, 400
 
     try:
 
@@ -880,6 +899,14 @@ def edit_profile():
 
             user = cursor.fetchone()
 
+            if user and user.get("profile_pic"):
+                try:
+                    user["profile_url"] = generate_presigned_url(
+                        user["profile_pic"]
+                    )
+                except Exception:
+                    user["profile_url"] = None
+
             return render_template(
                 "edit_profile.html",
                 user=user
@@ -898,8 +925,9 @@ def edit_profile():
 
         if file and file.filename:
 
-            if not allowed_file(file.filename):
-                return "Invalid profile picture format", 400
+            upload_error = validate_upload(file)
+            if upload_error:
+                return upload_error, 400
 
             profile_pic = upload_image(
                 file,
