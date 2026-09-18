@@ -724,11 +724,26 @@ a {
 
 body {
     font-family: "DM Sans", sans-serif;
-    background: linear-gradient(180deg, #dff5ff 0%, #eefaff 42%, #f8fcff 100%);
+    background:
+        linear-gradient(180deg, rgba(255, 153, 51, .92) 0%, rgba(255, 175, 92, .68) 26%, rgba(255, 255, 255, .96) 45%, rgba(255, 255, 255, .96) 58%, rgba(19, 136, 8, .62) 78%, rgba(19, 136, 8, .92) 100%),
+        #ffffff;
     color: var(--ink);
     min-height: 100vh;
     isolation: isolate;
     overflow-x: hidden;
+}
+
+body::before {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+        linear-gradient(rgba(0, 0, 128, .055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 0, 128, .055) 1px, transparent 1px),
+        radial-gradient(circle at 50% 42%, transparent 0 27%, rgba(0, 0, 128, .13) 100%);
+    background-size: 56px 56px, 56px 56px, 100% 100%;
+    content: "";
+    pointer-events: none;
 }
 
 .cloudscape {
@@ -737,6 +752,7 @@ body {
     z-index: -1;
     overflow: hidden;
     pointer-events: none;
+    opacity: .82;
 }
 
 .cloud {
@@ -745,13 +761,13 @@ body {
     width: 220px;
     height: 42px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, .72);
-    filter: blur(1px);
+    background: rgba(255, 255, 255, .84);
+    filter: blur(1.5px);
     box-shadow:
         42px -22px 0 -4px rgba(255, 255, 255, .72),
         92px -10px 0 8px rgba(255, 255, 255, .72),
         148px 2px 0 -2px rgba(255, 255, 255, .72),
-        0 12px 24px rgba(83, 157, 185, .08);
+        0 12px 24px rgba(0, 0, 128, .12);
 }
 
 .cloud-one {
@@ -805,7 +821,7 @@ h1, h2, h3, .logo, .eyebrow {
 
 .navbar {
     height: 72px;
-    background: rgba(255, 255, 255, .94);
+    background: rgba(255, 255, 255, .90);
     border-bottom: 1px solid var(--border);
     box-shadow: 0 4px 18px rgba(0, 0, 128, .08);
     position: sticky;
@@ -874,6 +890,11 @@ h1, h2, h3, .logo, .eyebrow {
     border: 1px solid var(--border);
     border-radius: 8px;
     box-shadow: var(--shadow);
+}
+
+.post-card, .stories-panel, .sidebar, .profile-header, .upload-card, .auth-card {
+    background: rgba(255, 255, 255, .91);
+    backdrop-filter: blur(12px);
 }
 
 .stories-panel {
