@@ -15,7 +15,9 @@ from services.db_service import get_db
 from services.s3_service import (
     upload_image,
     generate_presigned_url,
-    delete_image
+    delete_image,
+    check_storage,
+    StorageError
 )
 
 
@@ -488,9 +490,10 @@ def upload():
 
     except Exception as e:
 
-        print(f"S3 upload error ({type(e).__name__}): {e}")
+        error_code = getattr(e, "code", type(e).__name__)
+        print(f"S3 upload error ({error_code}): {e}")
 
-        return "Image upload failed. Check the S3 bucket configuration and permissions.", 500
+        return f"Image upload failed ({error_code}). Check the S3 bucket configuration and permissions.", 500
 
     db = None
     cursor = None
@@ -1098,10 +1101,24 @@ def health():
 
         cursor.fetchone()
 
-        return jsonify({
+        storage_status = "connected"
+        storage_error = None
+        try:
+            check_storage()
+        except StorageError as error:
+            storage_status = "disconnected"
+            storage_error = error.code
+
+        response = {
             "status": "healthy",
-            "database": "connected"
-        })
+            "database": "connected",
+            "storage": storage_status
+        }
+
+        if storage_error:
+            response["storage_error"] = storage_error
+
+        return jsonify(response), 200 if storage_status == "connected" else 503
 
     except Exception as e:
 

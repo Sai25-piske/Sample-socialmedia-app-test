@@ -18,9 +18,27 @@ BUCKET_NAME = os.getenv(
 )
 
 
+class StorageError(RuntimeError):
+    def __init__(self, message, code="StorageError"):
+        super().__init__(message)
+        self.code = code
+
+
 def validate_storage_config():
     if not BUCKET_NAME:
-        raise RuntimeError("S3_BUCKET is not configured")
+        raise StorageError("S3_BUCKET is not configured", "MissingBucket")
+
+
+def check_storage():
+    validate_storage_config()
+
+    try:
+        s3.head_bucket(Bucket=BUCKET_NAME)
+    except ClientError as error:
+        code = error.response.get("Error", {}).get("Code", "ClientError")
+        raise StorageError("S3 bucket check failed", code) from error
+    except BotoCoreError as error:
+        raise StorageError("AWS credentials or network check failed", "BotoCoreError") from error
 
 
 def upload_image(
@@ -53,8 +71,11 @@ def upload_image(
                 "ContentType": file.content_type or "application/octet-stream"
             }
         )
-    except (BotoCoreError, ClientError) as error:
-        raise RuntimeError("S3 rejected the image upload") from error
+    except ClientError as error:
+        code = error.response.get("Error", {}).get("Code", "ClientError")
+        raise StorageError("S3 rejected the image upload", code) from error
+    except BotoCoreError as error:
+        raise StorageError("AWS credentials or network upload failed", "BotoCoreError") from error
 
     return key
 
