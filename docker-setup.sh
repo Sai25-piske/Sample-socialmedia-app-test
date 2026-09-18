@@ -43,5 +43,12 @@ echo ""
 echo "Docker Compose version:"
 docker compose version
 
+echo "creating a new group"
+sudo usermod -aG docker ubuntu
+newgrp docker
+
+
 echo ""
 echo "Installation completed successfully!"
+
+
