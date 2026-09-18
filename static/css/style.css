@@ -717,9 +717,79 @@ a {
 
 body {
     font-family: "DM Sans", sans-serif;
-    background: #eefaff;
+    background: linear-gradient(180deg, #dff5ff 0%, #eefaff 42%, #f8fcff 100%);
     color: var(--ink);
-    background-image: radial-gradient(circle at 8% 0%, rgba(242, 201, 76, .18), transparent 25rem);
+    min-height: 100vh;
+    isolation: isolate;
+    overflow-x: hidden;
+}
+
+.cloudscape {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.cloud {
+    position: absolute;
+    display: block;
+    width: 220px;
+    height: 42px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .72);
+    filter: blur(1px);
+    box-shadow:
+        42px -22px 0 -4px rgba(255, 255, 255, .72),
+        92px -10px 0 8px rgba(255, 255, 255, .72),
+        148px 2px 0 -2px rgba(255, 255, 255, .72),
+        0 12px 24px rgba(83, 157, 185, .08);
+}
+
+.cloud-one {
+    top: 15%;
+    left: -70px;
+    transform: scale(.9);
+    animation: cloud-drift 34s linear infinite;
+}
+
+.cloud-two {
+    top: 31%;
+    right: -180px;
+    transform: scale(.72);
+    opacity: .58;
+    animation: cloud-drift-reverse 42s linear infinite;
+}
+
+.cloud-three {
+    top: 61%;
+    left: 18%;
+    transform: scale(.55);
+    opacity: .42;
+    animation: cloud-drift 50s linear infinite;
+}
+
+.cloud-four {
+    top: 82%;
+    right: 8%;
+    transform: scale(.45);
+    opacity: .35;
+    animation: cloud-drift-reverse 58s linear infinite;
+}
+
+@keyframes cloud-drift {
+    from { margin-left: -4vw; }
+    to { margin-left: 18vw; }
+}
+
+@keyframes cloud-drift-reverse {
+    from { margin-right: -4vw; }
+    to { margin-right: 18vw; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cloud { animation: none; }
 }
 
 h1, h2, h3, .logo, .eyebrow {
