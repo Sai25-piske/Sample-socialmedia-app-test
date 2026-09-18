@@ -27,7 +27,7 @@
     >
 
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Pacifico&display=swap"
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap"
         rel="stylesheet"
     >
 
@@ -50,12 +50,14 @@
 
             <div class="nav-links">
 
-                <a href="{{ url_for('feed') }}">
-                    Home
+                <a href="{{ url_for('feed') }}" title="Home">
+                    <span class="nav-icon">⌂</span>
+                    <span class="nav-label">Home</span>
                 </a>
 
-                <a href="{{ url_for('upload') }}">
-                    ＋
+                <a href="{{ url_for('upload') }}" class="nav-create" title="Create post">
+                    <span>＋</span>
+                    <span class="nav-label">Create</span>
                 </a>
 
                 <a
@@ -63,12 +65,15 @@
                         'profile',
                         username=session['username']
                     ) }}"
+                    title="Profile"
                 >
-                    Profile
+                    <span class="nav-icon">◉</span>
+                    <span class="nav-label">Profile</span>
                 </a>
 
-                <a href="{{ url_for('logout') }}">
-                    Logout
+                <a href="{{ url_for('logout') }}" title="Log out">
+                    <span class="nav-icon">↗</span>
+                    <span class="nav-label">Log out</span>
                 </a>
 
             </div>

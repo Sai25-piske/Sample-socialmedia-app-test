@@ -31,7 +31,10 @@ document.addEventListener(
 
                 if (result.success) {
                     button.classList.toggle("liked", result.liked);
-                    button.querySelector(".like-count").textContent = result.like_count;
+                    const count = document.getElementById(`likes-${button.closest(".post-card").dataset.postId}`);
+                    if (count) count.textContent = result.like_count;
+                    const label = count && count.parentElement;
+                    if (label) label.lastChild.textContent = result.like_count === 1 ? " like" : " likes";
                 }
             });
         });
@@ -77,6 +80,29 @@ function previewProfileImage(event) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".share-btn").forEach(function (button) {
+        button.addEventListener("click", async function () {
+            const shareUrl = button.dataset.shareUrl;
+            if (navigator.share) {
+                await navigator.share({ title: "PiskeGram", url: shareUrl });
+            } else {
+                await navigator.clipboard.writeText(shareUrl);
+                button.classList.add("shared");
+                button.title = "Link copied";
+            }
+        });
+    });
+
+    document.querySelectorAll(".save-btn").forEach(function (button) {
+        const key = `piskegram-saved-${button.dataset.saveId}`;
+        button.classList.toggle("saved", localStorage.getItem(key) === "true");
+        button.addEventListener("click", function () {
+            const saved = !button.classList.contains("saved");
+            button.classList.toggle("saved", saved);
+            localStorage.setItem(key, saved);
+        });
+    });
+
     document.querySelectorAll("form[enctype='multipart/form-data']").forEach(function (form) {
         form.addEventListener("submit", function (event) {
             const fileInput = form.querySelector("input[type='file']");
@@ -89,3 +115,8 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
+function focusComment(postId) {
+    const input = document.querySelector(`#comment-${postId} input[name='comment']`);
+    if (input) input.focus();
+}

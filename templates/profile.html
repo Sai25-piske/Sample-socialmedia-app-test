@@ -57,6 +57,11 @@
                     posts
                 </span>
 
+                <span>
+                    <strong>{{ user.created_at.strftime('%Y') if user.created_at else '2026' }}</strong>
+                    joined
+                </span>
+
             </div>
 
 
@@ -67,6 +72,8 @@
             </p>
 
             {% endif %}
+
+            <p class="profile-presence">Sharing bright moments from PiskeGram.</p>
 
         </div>
 

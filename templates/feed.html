@@ -10,11 +10,40 @@ Home • PiskeGram
 
     <section class="feed">
 
+        <section class="stories-panel" aria-label="Stories">
+            <div class="section-heading">
+                <div>
+                    <span class="eyebrow">Today on PiskeGram</span>
+                    <h2>Stories</h2>
+                </div>
+                <span class="story-count">{{ posts|length }} moments</span>
+            </div>
+            <div class="story-strip">
+                <a class="story story-add" href="{{ url_for('upload') }}">
+                    <span class="story-ring"><span>＋</span></span>
+                    <span>Your story</span>
+                </a>
+                {% for post in posts[:6] %}
+                <a class="story" href="#post-{{ post.id }}">
+                    <span class="story-ring">
+                        {% if post.profile_url %}
+                        <img src="{{ post.profile_url }}" alt="{{ post.username }}">
+                        {% else %}
+                        <span>{{ post.username[0]|upper }}</span>
+                        {% endif %}
+                    </span>
+                    <span>{{ post.username }}</span>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+
         {% for post in posts %}
 
         <article
             class="post-card"
             data-post-id="{{ post.id }}"
+            id="post-{{ post.id }}"
         >
 
             <div class="post-header">
@@ -93,14 +122,15 @@ Home • PiskeGram
 
                 <button
                     class="action-btn like-btn
-                    {% if post.user_liked %}
+                    {% if post.liked %}
                     liked
                     {% endif %}"
-                    data-post-id="{{ post.id }}"
+                    data-url="{{ url_for('like_post', post_id=post.id) }}"
+                    aria-label="Like post"
                 >
 
                     <span class="heart">
-                        {% if post.user_liked %}
+                        {% if post.liked %}
                         ♥
                         {% else %}
                         ♡
@@ -112,9 +142,13 @@ Home • PiskeGram
                 <button
                     class="action-btn"
                     onclick="focusComment({{ post.id }})"
+                    aria-label="Comment"
                 >
                     💬
                 </button>
+
+                <button class="action-btn share-btn" data-share-url="{{ url_for('feed', _external=True) }}#post-{{ post.id }}" aria-label="Share post">↗</button>
+                <button class="action-btn save-btn" data-save-id="{{ post.id }}" aria-label="Save post">⌑</button>
 
             </div>
 
@@ -125,7 +159,7 @@ Home • PiskeGram
                     class="like-count"
                     id="likes-{{ post.id }}"
                 >
-                    {{ post.like_count }}
+                    <span id="likes-{{ post.id }}">{{ post.like_count }}</span>
                     {% if post.like_count == 1 %}
                     like
                     {% else %}
@@ -149,10 +183,7 @@ Home • PiskeGram
                 {% endif %}
 
 
-                <a
-                    class="comments-link"
-                    href="#"
-                >
+                <a class="comments-link" href="#comment-{{ post.id }}">
                     View all {{ post.comment_count }} comments
                 </a>
 
@@ -218,14 +249,19 @@ Home • PiskeGram
 
         <div class="sidebar-profile">
 
-            {% if current_user.profile_pic %}
+            {% if current_user_profile_url %}
 
             <img
-                src="{{ url_for(
-                    'static',
-                    filename='placeholder.png'
-                ) }}"
+                src="{{ current_user_profile_url }}"
+                class="avatar"
+                alt="{{ session['username'] }} profile picture"
             >
+
+            {% else %}
+
+            <div class="avatar avatar-placeholder">
+                {{ session["username"][0]|upper }}
+            </div>
 
             {% endif %}
 
