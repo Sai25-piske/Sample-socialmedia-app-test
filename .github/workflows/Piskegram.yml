@@ -100,7 +100,6 @@ jobs:
       - name: Configure SSH
         env:
           SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          SSH_PASSPHRASE: ${{ secrets.EC2_SSH_PASSPHRASE }}
           BASTION_HOST: ${{ secrets.BASTION_HOST }}
           PRIVATE_HOST: ${{ secrets.PRIVATE_HOST }}
         run: |
@@ -119,74 +118,59 @@ jobs:
           printf '%s' "$SSH_PRIVATE_KEY" | sed 's/\\n/\n/g; s/\r$//' > ~/.ssh/deploy_key
           printf '\n' >> ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
+          cat > ~/.ssh/config <<EOF
+          Host bastion
+            HostName $BASTION_HOST
+            User $DEPLOY_USER
+            IdentityFile ~/.ssh/deploy_key
+            IdentitiesOnly yes
+            BatchMode yes
+            StrictHostKeyChecking yes
+            UserKnownHostsFile ~/.ssh/known_hosts
+
+          Host private-ec2
+            HostName $PRIVATE_HOST
+            User $DEPLOY_USER
+            IdentityFile ~/.ssh/deploy_key
+            IdentitiesOnly yes
+            BatchMode yes
+            StrictHostKeyChecking yes
+            UserKnownHostsFile ~/.ssh/known_hosts
+            ProxyJump bastion
+          EOF
+          chmod 600 ~/.ssh/config
           eval "$(ssh-agent -s)"
-          ssh-add ~/.ssh/deploy_key <<< "$SSH_PASSPHRASE"
+          ssh-keygen -y -f ~/.ssh/deploy_key > /dev/null
+          ssh-add ~/.ssh/deploy_key
           printf 'SSH_AUTH_SOCK=%s\n' "$SSH_AUTH_SOCK" >> "$GITHUB_ENV"
           echo "Deployment key fingerprint: $(ssh-add -L | ssh-keygen -lf - | awk '{print $2}')"
           ssh-keyscan -4 -T 10 -H "$BASTION_HOST" >> ~/.ssh/known_hosts
-          ssh -i ~/.ssh/deploy_key \
-            -o IdentitiesOnly=yes \
-            -o StrictHostKeyChecking=yes \
-            "${DEPLOY_USER}@${BASTION_HOST}" \
-            "ssh-keyscan -4 -T 10 -H '${PRIVATE_HOST}'" >> ~/.ssh/known_hosts
+          ssh bastion "ssh-keyscan -4 -T 10 -H '$PRIVATE_HOST'" >> ~/.ssh/known_hosts
 
       - name: Check private host connectivity
-        env:
-          BASTION_HOST: ${{ secrets.BASTION_HOST }}
-          PRIVATE_HOST: ${{ secrets.PRIVATE_HOST }}
         run: |
-          BASTION_HOST="$(printf '%s' "$BASTION_HOST" | tr -d '\r\n')"
-          PRIVATE_HOST="$(printf '%s' "$PRIVATE_HOST" | tr -d '\r\n')"
-          ssh -i ~/.ssh/deploy_key \
-            -o IdentitiesOnly=yes \
-            -o StrictHostKeyChecking=yes \
-            -J "${DEPLOY_USER}@${BASTION_HOST}" \
-            "${DEPLOY_USER}@${PRIVATE_HOST}" \
-            'docker compose version'
+          ssh private-ec2 'docker compose version'
 
       - name: Copy application to private host
-        env:
-          BASTION_HOST: ${{ secrets.BASTION_HOST }}
-          PRIVATE_HOST: ${{ secrets.PRIVATE_HOST }}
         run: |
-          BASTION_HOST="$(printf '%s' "$BASTION_HOST" | tr -d '\r\n')"
-          PRIVATE_HOST="$(printf '%s' "$PRIVATE_HOST" | tr -d '\r\n')"
           rsync -az --delete \
             --exclude '.git/' \
             --exclude '.github/' \
             --exclude '.env*' \
             --exclude '__pycache__/' \
             --exclude '*.pyc' \
-            -e "ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -J ${DEPLOY_USER}@${BASTION_HOST}" \
-            release/ "${DEPLOY_USER}@${PRIVATE_HOST}:${APP_PATH}/"
+            release/ "private-ec2:${APP_PATH}/"
 
       - name: Upload production environment file
         env:
-          BASTION_HOST: ${{ secrets.BASTION_HOST }}
-          PRIVATE_HOST: ${{ secrets.PRIVATE_HOST }}
           APP_ENV_FILE: ${{ secrets.APP_ENV_FILE }}
         run: |
-          BASTION_HOST="$(printf '%s' "$BASTION_HOST" | tr -d '\r\n')"
-          PRIVATE_HOST="$(printf '%s' "$PRIVATE_HOST" | tr -d '\r\n')"
-          printf '%s\n' "$APP_ENV_FILE" | ssh -i ~/.ssh/deploy_key \
-            -o IdentitiesOnly=yes \
-            -o StrictHostKeyChecking=yes \
-            -J "${DEPLOY_USER}@${BASTION_HOST}" \
-            "${DEPLOY_USER}@${PRIVATE_HOST}" \
+          printf '%s\n' "$APP_ENV_FILE" | ssh private-ec2 \
             "umask 077 && mkdir -p '${APP_PATH}' && cat > '${APP_PATH}/.env'"
 
       - name: Rebuild and restart application
-        env:
-          BASTION_HOST: ${{ secrets.BASTION_HOST }}
-          PRIVATE_HOST: ${{ secrets.PRIVATE_HOST }}
         run: |
-          BASTION_HOST="$(printf '%s' "$BASTION_HOST" | tr -d '\r\n')"
-          PRIVATE_HOST="$(printf '%s' "$PRIVATE_HOST" | tr -d '\r\n')"
-          ssh -i ~/.ssh/deploy_key \
-            -o IdentitiesOnly=yes \
-            -o StrictHostKeyChecking=yes \
-            -J "${DEPLOY_USER}@${BASTION_HOST}" \
-            "${DEPLOY_USER}@${PRIVATE_HOST}" \
+          ssh private-ec2 \
             "cd '${APP_PATH}' && docker compose up -d --build --remove-orphans && docker compose ps"
 
       - name: Remove deployment key
