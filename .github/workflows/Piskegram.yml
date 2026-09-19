@@ -10,8 +10,8 @@ permissions:
   contents: read
 
 env:
-  APP_PATH: /home/ubuntu/Sample-socialmedia-app-test
-  DEPLOY_USER: ubuntu
+  APP_PATH: /root/Sample-socialmedia-app-test
+  DEPLOY_USER: root
 
 jobs:
   validate:
@@ -170,7 +170,7 @@ jobs:
           APP_ENV_FILE: ${{ secrets.APP_ENV_FILE }}
         run: |
           printf '%s\n' "$APP_ENV_FILE" | ssh private-ec2 \
-            "-n mkdir -p '${APP_PATH}' && -n tee '${APP_PATH}/.env' > /dev/null && sudo -n chown '${DEPLOY_USER}:${DEPLOY_USER}' '${APP_PATH}/.env' && sudo -n chmod 600 '${APP_PATH}/.env'"
+            "mkdir -p '${APP_PATH}' && tee '${APP_PATH}/.env' > /dev/null && chown '${DEPLOY_USER}:${DEPLOY_USER}' '${APP_PATH}/.env' && chmod 600 '${APP_PATH}/.env'"
 
       - name: Rebuild and restart application
         run: |
