@@ -95,7 +95,7 @@ jobs:
           }
 
       - name: Install SSH tools
-        run: apt-get update && apt-get install --yes rsync
+        run: sudo apt-get update && sudo apt-get install --yes rsync
 
       - name: Configure SSH
         env:
