@@ -98,6 +98,27 @@ a {
     width: 100%;
 }
 
+.feed-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.feed-tabs a {
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+    padding: 8px 14px;
+}
+
+.feed-tabs a.active {
+    background: var(--brown-700);
+    border-color: var(--brown-700);
+    color: white;
+}
+
 .post-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -315,6 +336,15 @@ a {
     padding: 8px 14px;
     font-size: 13px;
     font-weight: 600;
+}
+
+.follow-form {
+    margin: 0;
+}
+
+.follow-btn {
+    cursor: pointer;
+    width: auto;
 }
 
 .more-btn {

@@ -5,10 +5,12 @@ from flask import (
     redirect,
     url_for,
     session,
-    jsonify
+    jsonify,
+    flash
 )
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
+from mysql.connector import Error as MySQLError, IntegrityError
 import os
 
 from services.db_service import get_db
@@ -154,6 +156,10 @@ def feed():
     if "user_id" not in session:
         return redirect(url_for("login"))
 
+    feed_mode = request.args.get("feed", "all")
+    if feed_mode not in {"all", "following"}:
+        feed_mode = "all"
+
     db = None
     cursor = None
 
@@ -175,8 +181,21 @@ def feed():
             FROM posts
             JOIN users
                 ON posts.user_id = users.id
+            WHERE %s = 'all'
+                OR posts.user_id = %s
+                OR EXISTS (
+                    SELECT 1
+                    FROM follows
+                    WHERE follows.follower_id = %s
+                    AND follows.followed_id = posts.user_id
+                )
             ORDER BY posts.created_at DESC
-            """
+            """,
+            (
+                feed_mode,
+                session["user_id"],
+                session["user_id"]
+            )
         )
 
         posts = cursor.fetchall()
@@ -244,7 +263,8 @@ def feed():
 
         return render_template(
             "feed.html",
-            posts=posts
+            posts=posts,
+            feed_mode=feed_mode
         )
 
     except Exception as e:
@@ -288,10 +308,16 @@ def register():
     )
 
     if not username or not email or not password:
-        return "All fields are required", 400
+        flash("All fields are required.", "error")
+        return render_template("register.html"), 400
+
+    if len(username) > 50 or len(email) > 150:
+        flash("Username must be 50 characters or fewer and email 150 or fewer.", "error")
+        return render_template("register.html"), 400
 
     if len(password) < 6:
-        return "Password must be at least 6 characters", 400
+        flash("Password must be at least 6 characters.", "error")
+        return render_template("register.html"), 400
 
     db = None
     cursor = None
@@ -318,7 +344,8 @@ def register():
         existing_user = cursor.fetchone()
 
         if existing_user:
-            return "Username or email already exists", 409
+            flash("That username or email is already registered.", "error")
+            return render_template("register.html"), 409
 
         password_hash = generate_password_hash(
             password
@@ -348,18 +375,27 @@ def register():
 
         db.commit()
 
+        flash("Your account was created. Please log in.", "success")
         return redirect(
             url_for("login")
         )
 
-    except Exception as e:
+    except IntegrityError as e:
+        if db:
+            db.rollback()
+
+        print(f"Registration conflict: {e}")
+        flash("That username or email is already registered.", "error")
+        return render_template("register.html"), 409
+
+    except MySQLError as e:
 
         if db:
             db.rollback()
 
         print(f"Registration error: {e}")
-
-        return "Registration failed", 500
+        flash("We couldn't create your account right now. Please try again shortly.", "error")
+        return render_template("register.html"), 503
 
     finally:
 
@@ -756,6 +792,85 @@ def comment(post_id):
 # PROFILE
 # --------------------------------------------------
 
+@app.route("/follow/<int:user_id>", methods=["POST"])
+def update_follow(user_id):
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    action = request.form.get("action")
+    if action not in {"follow", "unfollow"}:
+        return "Invalid follow action", 400
+
+    if user_id == session["user_id"]:
+        return "You cannot follow yourself", 400
+
+    db = None
+    cursor = None
+
+    try:
+
+        db = get_db()
+        cursor = db.cursor(dictionary=True)
+
+        cursor.execute(
+            """
+            SELECT id, username
+            FROM users
+            WHERE id = %s
+            """,
+            (user_id,)
+        )
+
+        target_user = cursor.fetchone()
+        if not target_user:
+            return "User not found", 404
+
+        if action == "follow":
+            cursor.execute(
+                """
+                INSERT IGNORE INTO follows
+                    (follower_id, followed_id)
+                VALUES (%s, %s)
+                """,
+                (session["user_id"], user_id)
+            )
+            success_message = f"You are now following {target_user['username']}."
+        else:
+            cursor.execute(
+                """
+                DELETE FROM follows
+                WHERE follower_id = %s
+                AND followed_id = %s
+                """,
+                (session["user_id"], user_id)
+            )
+            success_message = f"You unfollowed {target_user['username']}."
+
+        db.commit()
+        flash(success_message, "success")
+        return redirect(
+            url_for("profile", username=target_user["username"])
+        )
+
+    except MySQLError as e:
+
+        if db:
+            db.rollback()
+
+        print(f"Follow update error: {e}")
+        flash("We couldn't update that follow right now. Please try again.", "error")
+        return redirect(url_for("feed"))
+
+    finally:
+
+        if cursor:
+            cursor.close()
+
+        if db:
+            db.close()
+
+
 @app.route("/profile/<username>")
 def profile(username):
 
@@ -838,6 +953,31 @@ def profile(username):
         )
 
         post_count = cursor.fetchone()["count"]
+
+        cursor.execute(
+            """
+            SELECT
+                (SELECT COUNT(*)
+                 FROM follows
+                 WHERE followed_id = %s) AS follower_count,
+                (SELECT COUNT(*)
+                 FROM follows
+                 WHERE follower_id = %s) AS following_count,
+                EXISTS (
+                    SELECT 1
+                    FROM follows
+                    WHERE follower_id = %s
+                    AND followed_id = %s
+                ) AS is_following
+            """,
+            (
+                user["id"],
+                user["id"],
+                session.get("user_id"),
+                user["id"]
+            )
+        )
+        user.update(cursor.fetchone())
 
         return render_template(
             "profile.html",

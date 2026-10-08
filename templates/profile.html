@@ -34,7 +34,7 @@
                     {{ user.username }}
                 </h1>
 
-                {% if user.id == session["user_id"] %}
+                {% if user.id == session.get("user_id") %}
 
                 <a
                     href="{{ url_for('edit_profile') }}"
@@ -42,6 +42,22 @@
                 >
                     Edit profile
                 </a>
+
+                {% elif session.get("user_id") %}
+
+                <form
+                    method="POST"
+                    action="{{ url_for('update_follow', user_id=user.id) }}"
+                    class="follow-form"
+                >
+                    {% if user.is_following %}
+                    <input type="hidden" name="action" value="unfollow">
+                    <button type="submit" class="secondary-btn follow-btn">Following</button>
+                    {% else %}
+                    <input type="hidden" name="action" value="follow">
+                    <button type="submit" class="primary-btn follow-btn">Follow</button>
+                    {% endif %}
+                </form>
 
                 {% endif %}
 
@@ -52,9 +68,19 @@
 
                 <span>
                     <strong>
-                        {{ posts|length }}
+                        {{ post_count }}
                     </strong>
                     posts
+                </span>
+
+                <span>
+                    <strong>{{ user.follower_count }}</strong>
+                    followers
+                </span>
+
+                <span>
+                    <strong>{{ user.following_count }}</strong>
+                    following
                 </span>
 
                 <span>

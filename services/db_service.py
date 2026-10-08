@@ -55,6 +55,35 @@ def init_db():
         """)
 
         cursor.execute("""
+            CREATE TABLE IF NOT EXISTS follows (
+
+                follower_id INT NOT NULL,
+
+                followed_id INT NOT NULL,
+
+                created_at TIMESTAMP
+                    DEFAULT CURRENT_TIMESTAMP,
+
+                PRIMARY KEY
+                    (follower_id, followed_id),
+
+                KEY idx_follows_followed_id
+                    (followed_id),
+
+                CONSTRAINT chk_follows_not_self
+                    CHECK (follower_id <> followed_id),
+
+                FOREIGN KEY (follower_id)
+                    REFERENCES users(id)
+                    ON DELETE CASCADE,
+
+                FOREIGN KEY (followed_id)
+                    REFERENCES users(id)
+                    ON DELETE CASCADE
+            )
+        """)
+
+        cursor.execute("""
             CREATE TABLE IF NOT EXISTS posts (
 
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -134,6 +163,7 @@ def init_db():
         print(
             f"Database initialization error: {e}"
         )
+        raise
 
     finally:
 

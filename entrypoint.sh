@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -eu
+
 echo "Starting PiskeGram..."
 
 echo "Waiting for MySQL..."
@@ -22,7 +24,7 @@ for i in range(30):
         print('MySQL is ready!')
         break
     except Exception as e:
-        print('Waiting for MySQL...')
+        print(f'MySQL connection attempt {i + 1}/30 failed: {e}')
         time.sleep(2)
 else:
     raise Exception('MySQL did not become ready')

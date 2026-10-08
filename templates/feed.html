@@ -10,6 +10,19 @@ Home • PiskeGram
 
     <section class="feed">
 
+        <nav class="feed-tabs" aria-label="Post feed">
+            <a
+                href="{{ url_for('feed', feed='all') }}"
+                class="{% if feed_mode == 'all' %}active{% endif %}"
+                {% if feed_mode == 'all' %}aria-current="page"{% endif %}
+            >All Posts</a>
+            <a
+                href="{{ url_for('feed', feed='following') }}"
+                class="{% if feed_mode == 'following' %}active{% endif %}"
+                {% if feed_mode == 'following' %}aria-current="page"{% endif %}
+            >Following</a>
+        </nav>
+
         <section class="stories-panel" aria-label="Stories">
             <div class="section-heading">
                 <div>
@@ -223,6 +236,22 @@ Home • PiskeGram
                 📸
             </div>
 
+            {% if feed_mode == "following" %}
+
+            <h2>
+                Your following feed is quiet
+            </h2>
+
+            <p>
+                Posts from people you follow will show up here.
+            </p>
+
+            <a href="{{ url_for('feed', feed='all') }}" class="primary-btn">
+                Browse all posts
+            </a>
+
+            {% else %}
+
             <h2>
                 Welcome to PiskeGram
             </h2>
@@ -237,6 +266,8 @@ Home • PiskeGram
             >
                 Create your first post
             </a>
+
+            {% endif %}
 
         </div>
 
