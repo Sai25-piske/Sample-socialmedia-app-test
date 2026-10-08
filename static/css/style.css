@@ -5,17 +5,17 @@
 }
 
 :root {
-    --sky-50: #f2fbfe;
-    --sky-100: #dff4fb;
-    --sky-300: #87ceeb;
-    --sky-500: #2f9dcc;
-    --brown-100: #eadfd5;
-    --brown-500: #795548;
-    --brown-700: #5a3825;
-    --brown-900: #3f271b;
-    --surface: #fffdfb;
-    --muted: #8b7770;
-    --border: #e6d8cf;
+    --sky-50: #fff7f7;
+    --sky-100: #fde8eb;
+    --sky-300: #e97886;
+    --sky-500: #c8102e;
+    --brown-100: #fff4d6;
+    --brown-500: #c79212;
+    --brown-700: #c8102e;
+    --brown-900: #211719;
+    --surface: #ffffff;
+    --muted: #75666a;
+    --border: #eadadd;
 }
 
 body {
@@ -725,37 +725,37 @@ a {
     color: var(--muted);
 }
 
-/* SKY + GOLD SOCIAL SYSTEM */
+/* RCB-inspired red, black, and gold theme */
 :root {
-    --sky-50: #f2fbff;
-    --sky-100: #d9f2fb;
-    --sky-300: #77cbe6;
-    --sky-500: #178fba;
-    --saffron-100: #fff0df;
-    --saffron-300: #ffb05c;
-    --saffron-500: #ff9933;
-    --green-100: #e8f5e5;
-    --green-300: #75b96e;
-    --green-500: #138808;
-    --navy: #000080;
-    --ink: #17324d;
-    --muted: #61788b;
+    --sky-50: #fff7f7;
+    --sky-100: #fde8eb;
+    --sky-300: #e97886;
+    --sky-500: #c8102e;
+    --saffron-100: #fff4d6;
+    --saffron-300: #e2ad32;
+    --saffron-500: #c79212;
+    --green-100: #fff4d6;
+    --green-300: #e2ad32;
+    --green-500: #9b6e00;
+    --navy: #151515;
+    --ink: #211719;
+    --muted: #75666a;
     --surface: #ffffff;
-    --border: #cfe2e5;
-    --shadow: 0 14px 36px rgba(0, 0, 128, .10);
+    --border: #eadadd;
+    --shadow: 0 14px 36px rgba(56, 13, 22, .12);
     --gold-100: var(--saffron-100);
     --gold-300: var(--saffron-300);
     --gold-500: var(--saffron-500);
     --brown-100: var(--saffron-100);
     --brown-500: var(--saffron-500);
-    --brown-700: var(--navy);
+    --brown-700: var(--sky-500);
     --brown-900: var(--ink);
 }
 
 body {
     font-family: "DM Sans", sans-serif;
     background:
-        linear-gradient(180deg, rgba(255, 153, 51, .92) 0%, rgba(255, 175, 92, .68) 26%, rgba(255, 255, 255, .96) 45%, rgba(255, 255, 255, .96) 58%, rgba(19, 136, 8, .62) 78%, rgba(19, 136, 8, .92) 100%),
+        linear-gradient(180deg, rgba(200, 16, 46, .14) 0%, rgba(255, 255, 255, .96) 36%, rgba(255, 255, 255, .96) 68%, rgba(21, 21, 21, .10) 100%),
         #ffffff;
     color: var(--ink);
     min-height: 100vh;
@@ -768,9 +768,9 @@ body::before {
     inset: 0;
     z-index: -1;
     background:
-        linear-gradient(rgba(0, 0, 128, .055) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 0, 128, .055) 1px, transparent 1px),
-        radial-gradient(circle at 50% 42%, transparent 0 27%, rgba(0, 0, 128, .13) 100%);
+        linear-gradient(rgba(200, 16, 46, .045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(200, 16, 46, .045) 1px, transparent 1px),
+        radial-gradient(circle at 50% 42%, transparent 0 27%, rgba(21, 21, 21, .11) 100%);
     background-size: 56px 56px, 56px 56px, 100% 100%;
     content: "";
     pointer-events: none;
@@ -797,7 +797,7 @@ body::before {
         42px -22px 0 -4px rgba(255, 255, 255, .72),
         92px -10px 0 8px rgba(255, 255, 255, .72),
         148px 2px 0 -2px rgba(255, 255, 255, .72),
-        0 12px 24px rgba(0, 0, 128, .12);
+        0 12px 24px rgba(21, 21, 21, .12);
 }
 
 .cloud-one {
@@ -853,7 +853,7 @@ h1, h2, h3, .logo, .eyebrow {
     height: 72px;
     background: rgba(255, 255, 255, .90);
     border-bottom: 1px solid var(--border);
-    box-shadow: 0 4px 18px rgba(0, 0, 128, .08);
+    box-shadow: 0 4px 18px rgba(21, 21, 21, .08);
     position: sticky;
 }
 
@@ -865,9 +865,9 @@ h1, h2, h3, .logo, .eyebrow {
     height: 3px;
     background: linear-gradient(
         90deg,
-        var(--saffron-500) 0 33.33%,
-        #ffffff 33.33% 66.66%,
-        var(--green-500) 66.66% 100%
+        var(--sky-500) 0 33.33%,
+        var(--navy) 33.33% 66.66%,
+        var(--gold-500) 66.66% 100%
     );
     content: "";
 }

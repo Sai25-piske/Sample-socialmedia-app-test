@@ -1,4 +1,4 @@
-name: Deploy PiskeGram to private EC2
+name: Deploy Bitla Gram to private EC2
 
 on:
   push:

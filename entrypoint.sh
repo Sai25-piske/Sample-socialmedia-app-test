@@ -2,7 +2,7 @@
 
 set -eu
 
-echo "Starting PiskeGram..."
+echo "Starting Bitla Gram..."
 
 echo "Waiting for MySQL..."
 

@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
         button.addEventListener("click", async function () {
             const shareUrl = button.dataset.shareUrl;
             if (navigator.share) {
-                await navigator.share({ title: "PiskeGram", url: shareUrl });
+                await navigator.share({ title: "Bitla Gram", url: shareUrl });
             } else {
                 await navigator.clipboard.writeText(shareUrl);
                 button.classList.add("shared");
