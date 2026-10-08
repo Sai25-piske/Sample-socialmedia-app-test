@@ -6,7 +6,8 @@ from flask import (
     url_for,
     session,
     jsonify,
-    flash
+    flash,
+    send_from_directory
 )
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
@@ -15,6 +16,7 @@ import os
 
 from services.db_service import get_db
 from services.s3_service import (
+    LOCAL_UPLOAD_DIR,
     upload_image,
     generate_presigned_url,
     delete_image,
@@ -79,6 +81,11 @@ def validate_upload(file):
 @app.errorhandler(413)
 def request_too_large(error):
     return "The image is too large. Please choose an image up to 15 MB.", 413
+
+
+@app.route("/media/<path:key>")
+def local_media(key):
+    return send_from_directory(LOCAL_UPLOAD_DIR, key)
 
 
 # --------------------------------------------------
@@ -311,6 +318,8 @@ def register():
         flash("All fields are required.", "error")
         return render_template("register.html"), 400
 
+    email = email.lower()
+
     if len(username) > 50 or len(email) > 150:
         flash("Username must be 50 characters or fewer and email 150 or fewer.", "error")
         return render_template("register.html"), 400
@@ -375,9 +384,11 @@ def register():
 
         db.commit()
 
-        flash("Your account was created. Please log in.", "success")
+        session["user_id"] = cursor.lastrowid
+        session["username"] = username
+        flash("Your account is ready. Share your first photo!", "success")
         return redirect(
-            url_for("login")
+            url_for("feed")
         )
 
     except IntegrityError as e:
@@ -394,7 +405,7 @@ def register():
             db.rollback()
 
         print(f"Registration error: {e}")
-        flash("We couldn't create your account right now. Please try again shortly.", "error")
+        flash("Account creation failed because the database is unavailable. Check the MySQL container logs and try again.", "error")
         return render_template("register.html"), 503
 
     finally:
@@ -446,13 +457,15 @@ def login():
         user = cursor.fetchone()
 
         if not user:
-            return "Invalid username or password", 401
+            flash("Invalid username or password.", "error")
+            return render_template("login.html"), 401
 
         if not check_password_hash(
             user["password_hash"],
             password
         ):
-            return "Invalid username or password", 401
+            flash("Invalid username or password.", "error")
+            return render_template("login.html"), 401
 
         session["user_id"] = user["id"]
         session["username"] = user["username"]
@@ -461,11 +474,17 @@ def login():
             url_for("feed")
         )
 
+    except MySQLError as e:
+
+        print(f"Login error: {e}")
+        flash("Login is unavailable because the database could not be reached. Check the MySQL container and try again.", "error")
+        return render_template("login.html"), 503
+
     except Exception as e:
 
         print(f"Login error: {e}")
-
-        return "Login failed", 500
+        flash("Unable to log in right now. Please try again.", "error")
+        return render_template("login.html"), 500
 
     finally:
 
@@ -518,7 +537,7 @@ def upload():
 
     try:
 
-        # Upload image to S3
+        # Upload image to configured storage (local disk by default).
         image_key = upload_image(
             file,
             folder="uploads"
@@ -527,9 +546,9 @@ def upload():
     except Exception as e:
 
         error_code = getattr(e, "code", type(e).__name__)
-        print(f"S3 upload error ({error_code}): {e}")
-
-        return f"Image upload failed ({error_code}). Check the S3 bucket configuration and permissions.", 500
+        print(f"Image upload error ({error_code}): {e}")
+        flash("The image could not be saved. Check the app container logs and try again.", "error")
+        return render_template("upload.html"), 503
 
     db = None
     cursor = None
@@ -574,7 +593,7 @@ def upload():
 
         print(f"Post database error: {e}")
 
-        # Delete uploaded S3 image if DB insert fails
+        # Delete uploaded image if the database insert fails.
         try:
             delete_image(image_key)
         except Exception:

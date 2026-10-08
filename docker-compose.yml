@@ -7,7 +7,7 @@ services:
 
     restart: unless-stopped
 
-    # Local-development defaults; override these values in a .env file for deployment.
+    # Use a fresh DB volume so old credentials from previous Compose setups cannot block signup.
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-local-root-password}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-piskegram}
@@ -15,7 +15,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-local-piskegram-password}
 
     volumes:
-      - mysql_data:/var/lib/mysql
+      - bitlagram_mysql_data:/var/lib/mysql
 
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p\"$${MYSQL_ROOT_PASSWORD}\""]
@@ -50,6 +50,10 @@ services:
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
       AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-}
+      LOCAL_UPLOAD_DIR: /app/uploads
+
+    volumes:
+      - uploads_data:/app/uploads
 
     depends_on:
       mysql:
@@ -64,7 +68,9 @@ services:
 
 volumes:
 
-  mysql_data:
+  bitlagram_mysql_data:
+
+  uploads_data:
 
 
 networks:

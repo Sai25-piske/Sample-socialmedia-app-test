@@ -1,20 +1,32 @@
 import os
 import uuid
+from pathlib import Path, PurePosixPath
+from urllib.parse import quote
+
 import boto3
 from botocore.exceptions import BotoCoreError, ClientError
 
 
-s3 = boto3.client(
-    "s3",
-    region_name=os.getenv(
-        "AWS_REGION",
-        "ap-south-1"
-    )
+configured_bucket = os.getenv("S3_BUCKET", "").strip()
+BUCKET_NAME = (
+    None
+    if configured_bucket.lower() in {"", "your_s3_bucket_name"}
+    else configured_bucket
 )
+LOCAL_UPLOAD_DIR = Path(
+    os.getenv(
+        "LOCAL_UPLOAD_DIR",
+        str(Path(__file__).resolve().parent.parent / "uploads")
+    )
+).resolve()
 
-
-BUCKET_NAME = os.getenv(
-    "S3_BUCKET"
+s3 = (
+    boto3.client(
+        "s3",
+        region_name=os.getenv("AWS_REGION", "ap-south-1")
+    )
+    if BUCKET_NAME
+    else None
 )
 
 
@@ -25,13 +37,19 @@ class StorageError(RuntimeError):
 
 
 def validate_storage_config():
-    if not BUCKET_NAME:
-        raise StorageError("S3_BUCKET is not configured", "MissingBucket")
+    if BUCKET_NAME and s3 is None:
+        raise StorageError("S3 client is unavailable", "MissingS3Client")
 
 
 def check_storage():
-    validate_storage_config()
+    if not BUCKET_NAME:
+        try:
+            LOCAL_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+        except OSError as error:
+            raise StorageError("Local image storage is not writable", "LocalStorageError") from error
+        return
 
+    validate_storage_config()
     try:
         s3.head_bucket(Bucket=BUCKET_NAME)
     except ClientError as error:
@@ -46,8 +64,6 @@ def upload_image(
     folder="uploads"
 ):
 
-    validate_storage_config()
-
     file.stream.seek(0)
 
     extension = os.path.splitext(
@@ -58,10 +74,27 @@ def upload_image(
         f"{uuid.uuid4()}{extension}"
     )
 
-    key = (
-        f"{folder}/{filename}"
-    )
+    folder_path = PurePosixPath(folder)
+    if folder_path.is_absolute() or ".." in folder_path.parts:
+        raise StorageError("Invalid image folder", "InvalidImagePath")
 
+    key = str(folder_path / filename)
+
+    if not BUCKET_NAME:
+        destination = (LOCAL_UPLOAD_DIR / Path(*folder_path.parts) / filename).resolve()
+        try:
+            destination.relative_to(LOCAL_UPLOAD_DIR)
+        except ValueError as error:
+            raise StorageError("Invalid image path", "InvalidImagePath") from error
+
+        try:
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            file.save(destination)
+        except OSError as error:
+            raise StorageError("Local image could not be saved", "LocalStorageError") from error
+        return key
+
+    validate_storage_config()
     try:
         s3.upload_fileobj(
             file,
@@ -82,8 +115,10 @@ def upload_image(
 
 def generate_presigned_url(key):
 
-    validate_storage_config()
+    if not BUCKET_NAME:
+        return f"/media/{quote(key, safe='/')}"
 
+    validate_storage_config()
     return s3.generate_presigned_url(
         "get_object",
         Params={
@@ -95,6 +130,15 @@ def generate_presigned_url(key):
 
 
 def delete_image(key):
+
+    if not BUCKET_NAME:
+        target = (LOCAL_UPLOAD_DIR / key).resolve()
+        try:
+            target.relative_to(LOCAL_UPLOAD_DIR)
+        except ValueError as error:
+            raise StorageError("Invalid image path", "InvalidImagePath") from error
+        target.unlink(missing_ok=True)
+        return
 
     validate_storage_config()
 

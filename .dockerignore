@@ -4,6 +4,7 @@
 .git/
 .github/
 __pycache__/
+.venv/
 *.py[cod]
 *.log
 *.tar.gz

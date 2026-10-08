@@ -25,6 +25,8 @@ Create Account • Bitla Gram
                 name="username"
                 placeholder="Username"
                 value="{{ request.form.get('username', '') }}"
+                maxlength="50"
+                autocomplete="username"
                 required
             >
 
@@ -33,15 +35,23 @@ Create Account • Bitla Gram
                 name="email"
                 placeholder="Email"
                 value="{{ request.form.get('email', '') }}"
+                maxlength="150"
+                autocomplete="email"
                 required
             >
 
             <input
                 type="password"
                 name="password"
-                placeholder="Password"
+                placeholder="Password (at least 6 characters)"
+                minlength="6"
+                autocomplete="new-password"
                 required
             >
+
+            <p class="auth-subtitle">
+                Choose a password with at least 6 characters. After signup, you will be signed in automatically.
+            </p>
 
             <button
                 type="submit"
