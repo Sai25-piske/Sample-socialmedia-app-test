@@ -6,7 +6,7 @@ from mysql.connector import Error
 def get_db():
 
     return mysql.connector.connect(
-        host=os.getenv("MYSQL_HOST", "localhost"),
+        host=os.getenv("MYSQL_HOST", "mysql"),
         port=int(os.getenv("MYSQL_PORT", "3306")),
         user=os.getenv("MYSQL_USER", "piskegram_user"),
         password=os.getenv("MYSQL_PASSWORD", "local-piskegram-password"),

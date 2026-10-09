@@ -39,7 +39,7 @@ services:
 
     environment:
       FLASK_SECRET_KEY: ${FLASK_SECRET_KEY:-local-development-secret-key-change-me}
-      MYSQL_HOST: ${MYSQL_HOST:-mysql}
+      MYSQL_HOST: mysql
       MYSQL_PORT: ${MYSQL_PORT:-3306}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-piskegram}
       MYSQL_USER: ${MYSQL_USER:-piskegram_user}
